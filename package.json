@@ -1,0 +1,23 @@
+{
+  "name": "when-it-rains",
+  "version": "1.0.0",
+  "description": "An application that creates a ClickUp task when precipitation is likely",
+  "main": "app.js",
+  "scripts": {
+    "start": "node app.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/sethlewis93/when-it-rains.git"
+  },
+  "author": "Seth Lewis",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/sethlewis93/when-it-rains/issues"
+  },
+  "homepage": "https://github.com/sethlewis93/when-it-rains#readme",
+  "dependencies": {
+    "dotenv": "^16.0.3"
+  }
+}
