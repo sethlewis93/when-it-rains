@@ -7,6 +7,7 @@ const clickUpAPIKey = `${process.env.CLICKUP_API_KEY}`;
 const clickupListID = `${process.env.CLICKUP_LIST_ID}`;
 const accuWeatherForecastURL = `http://dataservice.accuweather.com/forecasts/v1/hourly/12hour/${accuWeatherLocationKey}?apikey=${accuWeatherAPIKey}`;
 
+/* Source: https://gist.github.com/farhad-taran/f487a07c16fd53ee08a12a90cdaea082 */
 function runAtSpecificTimeOfDay(hour, minutes, func) {
   const twelveHours = 43200000;
   const now = new Date();
