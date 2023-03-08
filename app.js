@@ -36,10 +36,10 @@ function runAtSpecificTimeOfDay(hour, minutes, func) {
 }
 
 // Call the function every twelve hours starting at 7:00
-runAtSpecificTimeOfDay(07, 0, getAccuWeatherForecastDataAndCreateCUTask);
+runAtSpecificTimeOfDay(08, 59, getAccuWeatherForecastDataAndCreateCUTask);
 
 async function getAccuWeatherForecastDataAndCreateCUTask() {
-  // ACCUWEATHER DATA
+  // GET ACCUWEATHER DATA
   const forecast = await fetch(accuWeatherForecastURL).then((res) =>
     res.json()
   );
@@ -55,13 +55,17 @@ async function getAccuWeatherForecastDataAndCreateCUTask() {
     );
   }
 
-  let precipitativeForecast = precipitationLikely(forecast);
-  let precipitationProbability = precipitativeForecast.PrecipitationProbability;
-  let dateTimePrecipitationExpected = precipitativeForecast.DateTime;
-
   if (!precipitationLikely) {
+    // FIX-ME: Find an appropriate way to halt code execution while keeping the server running
+    console.log("No precipitation expected for the next twelve hours");
     process.exit();
   } else {
+    // VARIABLES DEPENDENT ON PRECIPITATION CHANCES
+    let precipitativeForecast = precipitationLikely(forecast);
+    let precipitationProbability =
+      precipitativeForecast.PrecipitationProbability;
+    let dateTimePrecipitationExpected = precipitativeForecast.DateTime;
+
     // CU VARIABLES
     // Declare and initalize precip and standard dates for use later
     let precipDateObject = new Date(dateTimePrecipitationExpected);
