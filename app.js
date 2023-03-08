@@ -7,7 +7,7 @@ const clickUpAPIKey = `${process.env.CLICKUP_API_KEY}`;
 const clickupListID = `${process.env.CLICKUP_LIST_ID}`;
 const accuWeatherForecastURL = `http://dataservice.accuweather.com/forecasts/v1/hourly/12hour/${accuWeatherLocationKey}?apikey=${accuWeatherAPIKey}`;
 
-/* Source: https://gist.github.com/farhad-taran/f487a07c16fd53ee08a12a90cdaea082 */
+// Source: https://gist.github.com/farhad-taran/f487a07c16fd53ee08a12a90cdaea082
 function runAtSpecificTimeOfDay(hour, minutes, func) {
   const twelveHours = 43200000;
   const now = new Date();
@@ -27,6 +27,7 @@ function runAtSpecificTimeOfDay(hour, minutes, func) {
   setTimeout(function () {
     //run once
     func();
+
     // run every 12 hours from now on
     setInterval(func, twelveHours);
   }, timeInMilliseconds);
@@ -36,7 +37,7 @@ function runAtSpecificTimeOfDay(hour, minutes, func) {
 runAtSpecificTimeOfDay(07, 01, getAccuWeatherForecastDataAndCreateCUTask);
 
 async function getAccuWeatherForecastDataAndCreateCUTask() {
-  /* ACCUWEATHER DATA */
+  // ACCUWEATHER DATA
   const forecast = await fetch(accuWeatherForecastURL).then((res) =>
     res.json()
   );
@@ -47,16 +48,13 @@ async function getAccuWeatherForecastDataAndCreateCUTask() {
   if (precipitationProbability < 30) {
     process.exit();
   } else {
-    /* CREATE A CLICKUP TASK */
-
     // CU Vars
     let clickupURL = "https://api.clickup.com/api/v2";
     let today = new Date();
     let todaysDate = today.toDateString();
 
     // Using the Date object, get today's date and time, remove any decimals, and convert to unix millisecond figure
-
-    // https://stackoverflow.com/questions/11893083/convert-normal-date-to-unix-timestamp
+    // Source: https://stackoverflow.com/questions/11893083/convert-normal-date-to-unix-timestamp
     let dueDate = parseInt((today.getTime() / 1000).toFixed(0)) * 1000;
 
     // CU Headers
