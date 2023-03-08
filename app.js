@@ -1,11 +1,13 @@
 // Access hidden files in the .env file
 require("dotenv").config();
 
+// GLOBAL & ENV VARS
 const accuWeatherAPIKey = `${process.env.AW_API_KEY}`;
 const accuWeatherLocationKey = `${process.env.AW_LOCATION_KEY}`;
 const clickUpAPIKey = `${process.env.CLICKUP_API_KEY}`;
 const clickupListID = `${process.env.CLICKUP_LIST_ID}`;
 const accuWeatherForecastURL = `http://dataservice.accuweather.com/forecasts/v1/hourly/12hour/${accuWeatherLocationKey}?apikey=${accuWeatherAPIKey}`;
+const clickupURL = "https://api.clickup.com/api/v2";
 
 // Source: https://gist.github.com/farhad-taran/f487a07c16fd53ee08a12a90cdaea082
 function runAtSpecificTimeOfDay(hour, minutes, func) {
@@ -28,7 +30,7 @@ function runAtSpecificTimeOfDay(hour, minutes, func) {
     //run once
     func();
 
-    // run every 12 hours from now on
+    // run every 24 hours from now on
     setInterval(func, twentyFourHours);
   }, timeInMilliseconds);
 }
@@ -42,22 +44,55 @@ async function getAccuWeatherForecastDataAndCreateCUTask() {
     res.json()
   );
 
-  let twelfthHourForecast = forecast[forecast.length - 1];
-  let precipitationProbability = twelfthHourForecast.PrecipitationProbability;
+  /**
+   *
+   * @param {*} forecastArr
+   * @returns the first forecast object where the PrecipitationProbability prop is greater than 30(%)
+   */
+  function precipitationLikely(forecastArr) {
+    return forecastArr.find(
+      (forecastObj) => forecastObj.PrecipitationProbability > 30
+    );
+  }
 
-  if (precipitationProbability < 30) {
+  let precipitativeForecast = precipitationLikely(forecast);
+  let precipitationProbability = precipitativeForecast.PrecipitationProbability;
+  let dateTimePrecipitationExpected = precipitativeForecast.DateTime;
+
+  if (!precipitationLikely) {
     process.exit();
   } else {
-    // CU Vars
-    let clickupURL = "https://api.clickup.com/api/v2";
-    let today = new Date();
-    let todaysDate = today.toDateString();
+    // CU VARIABLES
+    // Declare and initalize precip and standard dates for use later
+    let precipDateObject = new Date(dateTimePrecipitationExpected);
+    let standardDateObject = new Date();
+    dateTimePrecipitationExpected = precipDateObject.toLocaleString("en-US", {
+      timeZone: "America/New_York",
+    });
 
-    // Using the Date object, get today's date and time, remove any decimals, and convert to unix millisecond figure
-    // Source: https://stackoverflow.com/questions/11893083/convert-normal-date-to-unix-timestamp
-    let dueDate = parseInt((today.getTime() / 1000).toFixed(0)) * 1000;
+    // Returns a human-readable time string
+    function getPrecipitationTime(dateTimeString) {
+      let result = "";
+      let dateTimeArr = dateTimeString.split(" ");
+      dateTimeArr.shift();
+      result = dateTimeArr.join(" ");
+      return (result = result.slice(0, 2) + " " + result.slice(-2));
+    }
 
-    // CU Headers
+    /* 
+      CALCULATE THE TASK DUE DATE
+      Using the Date object, get today's date and time, remove any decimals, and convert to unix millisecond figure
+      Source: https://stackoverflow.com/questions/11893083/convert-normal-date-to-unix-timestamp
+    */
+    let dueDate =
+      parseInt((standardDateObject.getTime() / 1000).toFixed(0)) * 1000;
+
+    // GET THE PRECIPITATION TIME FOR TASK DESCRIPTION
+    let timePrecipitationExpected = getPrecipitationTime(
+      dateTimePrecipitationExpected
+    );
+
+    // CU HEADERS
     let myHeaders = new Headers();
     myHeaders.append("Content-Type", "application/json");
     myHeaders.append("Authorization", clickUpAPIKey);
@@ -65,7 +100,7 @@ async function getAccuWeatherForecastDataAndCreateCUTask() {
     // CU JSON
     let raw = JSON.stringify({
       name: "Cover the firewood",
-      description: `There is a ${precipitationProbability}% chance of precipitation for ${todaysDate}. Make sure you cover the firewood today.`,
+      description: `The chance of precipitation is ${precipitationProbability}% at ${timePrecipitationExpected}. Make sure you cover the firewood today.`,
       assignees: [44411049],
       tags: ["accuweather-app"],
       status: "To Do",
@@ -73,10 +108,12 @@ async function getAccuWeatherForecastDataAndCreateCUTask() {
       due_date: dueDate,
       due_date_time: false,
       start_date_time: false,
-      notify_all: true,
+
+      // TO-DO: set to true before testing on mobile
+      notify_all: false,
     });
 
-    // CU Request
+    // CU REQUEST
     let requestOptions = {
       method: "POST",
       headers: myHeaders,
@@ -84,10 +121,13 @@ async function getAccuWeatherForecastDataAndCreateCUTask() {
       redirect: "follow",
     };
 
-    // CU Promise
+    // CU PROMISE
     const clickUpTaskData = await fetch(
       `${clickupURL}/list/${clickupListID}/task`,
       requestOptions
-    ).catch((err) => console.log(err));
+    )
+      .then((res) => res.json())
+      .then((data) => console.log(data))
+      .catch((err) => console.log(err));
   }
 }
