@@ -9,7 +9,13 @@ const clickupListID = `${process.env.CLICKUP_LIST_ID}`;
 const accuWeatherForecastURL = `http://dataservice.accuweather.com/forecasts/v1/hourly/12hour/${accuWeatherLocationKey}?apikey=${accuWeatherAPIKey}`;
 const clickupURL = "https://api.clickup.com/api/v2";
 
-// Source: https://gist.github.com/farhad-taran/f487a07c16fd53ee08a12a90cdaea082
+/**
+ * Calls a function at a specific time of day
+ * Source: https://gist.github.com/farhad-taran/f487a07c16fd53ee08a12a90cdaea082
+ * @param {q} hour
+ * @param {*} minutes
+ * @param {*} func
+ */
 function runAtSpecificTimeOfDay(hour, minutes, func) {
   const twentyFourHours = 86400000;
   const now = new Date();
@@ -35,9 +41,7 @@ function runAtSpecificTimeOfDay(hour, minutes, func) {
   }, timeInMilliseconds);
 }
 
-// Call the function every twelve hours starting at 7:00
-runAtSpecificTimeOfDay(08, 59, getAccuWeatherForecastDataAndCreateCUTask);
-
+// MAKES THE API CALLS
 async function getAccuWeatherForecastDataAndCreateCUTask() {
   // GET ACCUWEATHER DATA
   const forecast = await fetch(accuWeatherForecastURL).then((res) =>
@@ -55,11 +59,8 @@ async function getAccuWeatherForecastDataAndCreateCUTask() {
     );
   }
 
-  if (!precipitationLikely) {
-    // FIX-ME: Find an appropriate way to halt code execution while keeping the server running
-    console.log("No precipitation expected for the next twelve hours");
-    process.exit();
-  } else {
+  // Code to run given that there is a forecast object returned from precipitationLikely
+  try {
     // VARIABLES DEPENDENT ON PRECIPITATION CHANCES
     let precipitativeForecast = precipitationLikely(forecast);
     let precipitationProbability =
@@ -83,14 +84,6 @@ async function getAccuWeatherForecastDataAndCreateCUTask() {
       return (result = result.slice(0, 2) + " " + result.slice(-2));
     }
 
-    /* 
-      CALCULATE THE TASK DUE DATE
-      Using the Date object, get today's date and time, remove any decimals, and convert to unix millisecond figure
-      Source: https://stackoverflow.com/questions/11893083/convert-normal-date-to-unix-timestamp
-    */
-    let dueDate =
-      parseInt((standardDateObject.getTime() / 1000).toFixed(0)) * 1000;
-
     // GET THE PRECIPITATION TIME FOR TASK DESCRIPTION
     let timePrecipitationExpected = getPrecipitationTime(
       dateTimePrecipitationExpected
@@ -100,6 +93,15 @@ async function getAccuWeatherForecastDataAndCreateCUTask() {
     let myHeaders = new Headers();
     myHeaders.append("Content-Type", "application/json");
     myHeaders.append("Authorization", clickUpAPIKey);
+
+    /* 
+        CALCULATE THE TASK DUE DATE
+        Using the Date object, get today's date and time, remove any decimals, and convert to unix millisecond figure
+        Source: https://stackoverflow.com/questions/11893083/convert-normal-date-to-unix-timestamp
+    */
+
+    let dueDate =
+      parseInt((standardDateObject.getTime() / 1000).toFixed(0)) * 1000;
 
     // CU JSON
     let raw = JSON.stringify({
@@ -133,5 +135,21 @@ async function getAccuWeatherForecastDataAndCreateCUTask() {
       .then((res) => res.json())
       .then((data) => console.log(data))
       .catch((err) => console.log(err));
+
+    /**
+     * If precipitationLikely returns undefined,
+     * it most likely means that there is no forecast in the next twelve hours that meets the >30% chance precip criteria.
+     * In these cases, a TypeError is thrown because Node can't read any props of precipitativeForecast.undefined.
+     * We want to handle this case by printing the message to the console and keeping the program running.
+     */
+  } catch (error) {
+    if (error instanceof TypeError) {
+      console.log("Very low chance of precipitation for the next twelve hours");
+    } else {
+      console.log(error);
+    }
   }
 }
+
+// Call the function every twenty-four hours starting at a specific time
+runAtSpecificTimeOfDay(09, 31, getAccuWeatherForecastDataAndCreateCUTask);
