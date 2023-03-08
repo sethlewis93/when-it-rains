@@ -9,7 +9,7 @@ const accuWeatherForecastURL = `http://dataservice.accuweather.com/forecasts/v1/
 
 // Source: https://gist.github.com/farhad-taran/f487a07c16fd53ee08a12a90cdaea082
 function runAtSpecificTimeOfDay(hour, minutes, func) {
-  const twelveHours = 43200000;
+  const twentyFourHours = 86400000;
   const now = new Date();
   let timeInMilliseconds =
     new Date(
@@ -22,19 +22,19 @@ function runAtSpecificTimeOfDay(hour, minutes, func) {
       0
     ).getTime() - now;
   if (timeInMilliseconds < 0) {
-    timeInMilliseconds += twelveHours;
+    timeInMilliseconds += twentyFourHours;
   }
   setTimeout(function () {
     //run once
     func();
 
     // run every 12 hours from now on
-    setInterval(func, twelveHours);
+    setInterval(func, twentyFourHours);
   }, timeInMilliseconds);
 }
 
-// Call the function every twelve hours starting at 7:01
-runAtSpecificTimeOfDay(07, 01, getAccuWeatherForecastDataAndCreateCUTask);
+// Call the function every twelve hours starting at 7:00
+runAtSpecificTimeOfDay(07, 0, getAccuWeatherForecastDataAndCreateCUTask);
 
 async function getAccuWeatherForecastDataAndCreateCUTask() {
   // ACCUWEATHER DATA
