@@ -24,7 +24,7 @@ const clickUpAPIKey = `${process.env.CLICKUP_API_KEY}`;
 const clickupListID = `${process.env.CLICKUP_LIST_ID}`;
 const accuWeatherForecastURL = `http://dataservice.accuweather.com/forecasts/v1/hourly/12hour/${accuWeatherLocationKey}?apikey=${accuWeatherAPIKey}`;
 const clickupURL = "https://api.clickup.com/api/v2";
-let forecastMessage = "Awaiting message";
+let forecastMessage = "Awaiting forecast";
 
 /**
  * Calls a function at a specific time of day
@@ -173,5 +173,4 @@ async function getAccuWeatherForecastDataAndCreateCUTask() {
 }
 
 // Call the function every twenty-four hours starting at a specific time
-// runAtSpecificTimeOfDay(04, 57, getAccuWeatherForecastDataAndCreateCUTask);
-getAccuWeatherForecastDataAndCreateCUTask();
+runAtSpecificTimeOfDay(17, 10, getAccuWeatherForecastDataAndCreateCUTask);
