@@ -33,7 +33,7 @@ let forecastMessage = "Awaiting forecast";
  * @param {*} minutes
  * @param {*} func
  */
-function runAtSpecificTimeOfDay(hour, minutes, func) {
+function runAtTimeOfDay(hour, minutes, func) {
   const twentyFourHours = 86400000;
   const now = new Date();
   let timeInMilliseconds =
@@ -173,4 +173,4 @@ async function getAccuWeatherForecastDataAndCreateCUTask() {
 }
 
 // Call the function every twenty-four hours starting at a specific time
-runAtSpecificTimeOfDay(17, 10, getAccuWeatherForecastDataAndCreateCUTask);
+runAtTimeOfDay(17, 10, getAccuWeatherForecastDataAndCreateCUTask);
