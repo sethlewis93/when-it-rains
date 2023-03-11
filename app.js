@@ -9,7 +9,19 @@ app.set("view engine", "ejs");
 
 // user res.render to load ejs view file
 app.get("/", (req, res) => {
-  res.render("pages/index");
+  // Test data
+  let mascots = [
+    { name: "Sam", organization: "DigitalOcean", birth_year: 2012 },
+    { name: "Stew", organization: "Cowtippers", birth_year: 2023 },
+    { name: "StrongMad", organization: "Homestarrunner", birth_year: 1999 },
+  ];
+
+  let tagline = "What did the API programmer name his son?...";
+
+  res.render("pages/index", {
+    mascots: mascots,
+    tagline: tagline,
+  });
 });
 
 app.listen(PORT, () => console.log(`Listening on port ${PORT}`));

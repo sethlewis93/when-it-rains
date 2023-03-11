@@ -14,6 +14,19 @@
   <div class="jumbotron">
     <h1>Lorem Ipsum</h1>
     <p>Dolor sit amet</p>
+
+    <h2>Variable from app.js</h2>
+    <p><%= tagline %></p>
+
+    <ul>
+        <% mascots.forEach(function(mascot) { %>
+          <li>
+            <strong><%= mascot.name %></strong>
+            representing <%= mascot.organization %>,
+            born <%= mascot.birth_year %>
+          </li>
+        <% }); %>
+      </ul>
   </div>
 </main>
 
