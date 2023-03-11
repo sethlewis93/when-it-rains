@@ -133,9 +133,7 @@ async function getAccuWeatherForecastDataAndCreateCUTask() {
       due_date: dueDate,
       due_date_time: false,
       start_date_time: false,
-
-      // TO-DO: set to true before testing on mobile
-      notify_all: false,
+      notify_all: true,
     });
 
     // CU REQUEST
