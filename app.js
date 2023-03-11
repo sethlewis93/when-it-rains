@@ -2,7 +2,7 @@ const express = require("express");
 const bodyParser = require("body-parser");
 
 const app = express();
-const PORT = 3000;
+const port = 3000;
 
 // Set view engine to EJS
 app.set("view engine", "ejs");
@@ -12,7 +12,9 @@ app.get("/", (req, res) => {
   res.render("pages/index", { forecastMessage: forecastMessage });
 });
 
-app.listen(PORT, () => console.log(`Listening on port ${PORT}`));
+app.listen(process.env.PORT || port, () =>
+  console.log(`Listening on port ${port}`)
+);
 
 // Access hidden files in the .env file
 require("dotenv").config();
@@ -173,4 +175,4 @@ async function getAccuWeatherForecastDataAndCreateCUTask() {
 }
 
 // Call the function every twenty-four hours starting at a specific time
-runAtTimeOfDay(17, 10, getAccuWeatherForecastDataAndCreateCUTask);
+runAtTimeOfDay(07, 00, getAccuWeatherForecastDataAndCreateCUTask);
