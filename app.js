@@ -1,3 +1,19 @@
+const express = require("express");
+const bodyParser = require("body-parser");
+
+const app = express();
+const PORT = 3000;
+
+// Set view engine to EJS
+app.set("view engine", "ejs");
+
+// user res.render to load ejs view file
+app.get("/", (req, res) => {
+  res.render("pages/index");
+});
+
+app.listen(PORT, () => console.log(`Listening on port ${PORT}`));
+
 // Access hidden files in the .env file
 require("dotenv").config();
 
