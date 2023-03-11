@@ -9,7 +9,7 @@ app.set("view engine", "ejs");
 
 // user res.render to load ejs view file
 app.get("/", (req, res) => {
-  res.render("pages/index");
+  res.render("pages/index", { forecastMessage: forecastMessage });
 });
 
 app.listen(PORT, () => console.log(`Listening on port ${PORT}`));
@@ -24,6 +24,7 @@ const clickUpAPIKey = `${process.env.CLICKUP_API_KEY}`;
 const clickupListID = `${process.env.CLICKUP_LIST_ID}`;
 const accuWeatherForecastURL = `http://dataservice.accuweather.com/forecasts/v1/hourly/12hour/${accuWeatherLocationKey}?apikey=${accuWeatherAPIKey}`;
 const clickupURL = "https://api.clickup.com/api/v2";
+let forecastMessage = "Awaiting message";
 
 /**
  * Calls a function at a specific time of day
@@ -152,6 +153,8 @@ async function getAccuWeatherForecastDataAndCreateCUTask() {
       .then((data) => console.log(data))
       .catch((err) => console.log(err));
 
+    // Finally, assing the forecast message variable
+    forecastMessage = `The chance of precipitation is ${precipitationProbability}% at ${timePrecipitationExpected}. Make sure you cover the firewood today.`;
     /**
      * If precipitationLikely returns undefined,
      * it most likely means that there is no forecast in the next twelve hours that meets the >30% chance precip criteria.
@@ -160,6 +163,8 @@ async function getAccuWeatherForecastDataAndCreateCUTask() {
      */
   } catch (error) {
     if (error instanceof TypeError) {
+      forecastMessage =
+        "Very low chance of precipitation for the next twelve hours";
       console.log("Very low chance of precipitation for the next twelve hours");
     } else {
       console.log(error);
@@ -168,4 +173,5 @@ async function getAccuWeatherForecastDataAndCreateCUTask() {
 }
 
 // Call the function every twenty-four hours starting at a specific time
-runAtSpecificTimeOfDay(09, 31, getAccuWeatherForecastDataAndCreateCUTask);
+// runAtSpecificTimeOfDay(04, 57, getAccuWeatherForecastDataAndCreateCUTask);
+getAccuWeatherForecastDataAndCreateCUTask();
