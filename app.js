@@ -60,9 +60,8 @@ function runAtTimeOfDay(hour, minutes, func) {
   }, timeInMilliseconds);
 }
 
-// MAKES THE API CALLS
-async function getAccuWeatherForecastDataAndCreateCUTask() {
-  // GET ACCUWEATHER DATA
+// GET ACCUWEATHER DATA
+async function getAccuWeatherForecastData() {
   const forecast = await fetch(accuWeatherForecastURL).then((res) =>
     res.json()
   );
@@ -78,6 +77,11 @@ async function getAccuWeatherForecastDataAndCreateCUTask() {
     );
   }
 
+  return await precipitationLikely(forecast);
+}
+
+// MAKES THE API CALLS
+async function getAccuWeatherForecastDataAndCreateCUTask() {
   // Code to run given that there is a forecast object returned from precipitationLikely
   try {
     // VARIABLES DEPENDENT ON PRECIPITATION CHANCES
@@ -113,7 +117,7 @@ async function getAccuWeatherForecastDataAndCreateCUTask() {
     myHeaders.append("Content-Type", "application/json");
     myHeaders.append("Authorization", clickUpAPIKey);
 
-    /* 
+    /*
         CALCULATE THE TASK DUE DATE
         Using the Date object, get today's date and time, remove any decimals, and convert to unix millisecond figure
         Source: https://stackoverflow.com/questions/11893083/convert-normal-date-to-unix-timestamp
@@ -173,4 +177,4 @@ async function getAccuWeatherForecastDataAndCreateCUTask() {
 }
 
 // Call the function every twenty-four hours starting at a specific time
-runAtTimeOfDay(07, 00, getAccuWeatherForecastDataAndCreateCUTask);
+// runAtTimeOfDay(07, 00, getAccuWeatherForecastDataAndCreateCUTask);
