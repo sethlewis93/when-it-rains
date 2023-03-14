@@ -162,10 +162,10 @@ async function getAccuWeatherForecastDataAndCreateCUTask() {
      * We want to handle this case by printing the message to the console and keeping the program running.
      */
   } catch (error) {
-    if (error instanceof TypeError) {
+    if (error.message.includes("PrecipitationProbability")) {
       forecastMessage =
         "Very low chance of precipitation for the next twelve hours";
-      console.log("Very low chance of precipitation for the next twelve hours");
+      console.log(forecastMessage);
     } else {
       console.log(error);
     }
