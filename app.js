@@ -80,10 +80,10 @@ async function getAccuWeatherForecastData() {
   return await precipitationLikely(forecast);
 }
 
-// MAKES THE API CALLS
+// CREATES THE CU TASK
 async function createCUTask(forecastFunc) {
   try {
-    // DECLARE & INITIALIZE VARS DEPENDENT ON PRECIPITATION CHANCES
+    // Declare and initialize vars dependent on precipitation data
     let precipitativeForecastObject = await forecastFunc();
     let precipitationProbability =
       precipitativeForecastObject.PrecipitationProbability;
@@ -105,19 +105,19 @@ async function createCUTask(forecastFunc) {
       return (result = result.slice(0, 2) + " " + result.slice(-2));
     }
 
-    // GET THE PRECIPITATION TIME FOR TASK DESCRIPTION
+    // Get the precipitation time (to be used in task description)
     let timePrecipitationExpected = getPrecipitationTime(
       dateTimePrecipitationExpected
     );
 
-    // HEADERS
+    // Headers
     let myHeaders = new Headers();
     myHeaders.append("Content-Type", "application/json");
     myHeaders.append("Authorization", clickUpAPIKey);
 
     /*
-        CALCULATE THE TASK DUE DATE
-          Using the Date object, get today's date and time, remove any decimals, and convert to unix millisecond figure
+        Calculate the task due date
+        Using the Date object, get today's date and time, remove any decimals, and convert to unix millisecond figure
     */
 
     let dueDate =
@@ -145,7 +145,7 @@ async function createCUTask(forecastFunc) {
       redirect: "follow",
     };
 
-    // Promise
+    // Send POST request to create task
     const clickUpTaskData = await fetch(
       `${clickupURL}/list/${clickupListID}/task`,
       requestOptions
@@ -176,9 +176,10 @@ async function createCUTask(forecastFunc) {
   }
 }
 
+// Returns a call to fetch the endpoints
 async function start() {
   return await createCUTask(getAccuWeatherForecastData);
 }
 
 // Call the function every twenty-four hours starting at a specific time
-runAtTimeOfDay(23, 19, start);
+runAtTimeOfDay(07, 00, start);
