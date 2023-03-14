@@ -81,16 +81,14 @@ async function getAccuWeatherForecastData() {
 }
 
 // MAKES THE API CALLS
-async function getAccuWeatherForecastDataAndCreateCUTask() {
-  // Code to run given that there is a forecast object returned from precipitationLikely
+async function createCUTask(forecastFunc) {
   try {
-    // VARIABLES DEPENDENT ON PRECIPITATION CHANCES
-    let precipitativeForecast = precipitationLikely(forecast);
+    // DECLARE & INITIALIZE VARS DEPENDENT ON PRECIPITATION CHANCES
+    let precipitativeForecastObject = await forecastFunc();
     let precipitationProbability =
-      precipitativeForecast.PrecipitationProbability;
-    let dateTimePrecipitationExpected = precipitativeForecast.DateTime;
+      precipitativeForecastObject.PrecipitationProbability;
+    let dateTimePrecipitationExpected = precipitativeForecastObject.DateTime;
 
-    // CU VARIABLES
     // Declare and initalize precip and standard dates for use later
     let precipDateObject = new Date(dateTimePrecipitationExpected);
     let standardDateObject = new Date();
@@ -112,21 +110,20 @@ async function getAccuWeatherForecastDataAndCreateCUTask() {
       dateTimePrecipitationExpected
     );
 
-    // CU HEADERS
+    // HEADERS
     let myHeaders = new Headers();
     myHeaders.append("Content-Type", "application/json");
     myHeaders.append("Authorization", clickUpAPIKey);
 
     /*
         CALCULATE THE TASK DUE DATE
-        Using the Date object, get today's date and time, remove any decimals, and convert to unix millisecond figure
-        Source: https://stackoverflow.com/questions/11893083/convert-normal-date-to-unix-timestamp
+          Using the Date object, get today's date and time, remove any decimals, and convert to unix millisecond figure
     */
 
     let dueDate =
       parseInt((standardDateObject.getTime() / 1000).toFixed(0)) * 1000;
 
-    // CU JSON
+    // Request Body
     let raw = JSON.stringify({
       name: "Cover the firewood",
       description: `The chance of precipitation is ${precipitationProbability}% at ${timePrecipitationExpected}. Make sure you cover the firewood today.`,
@@ -140,7 +137,7 @@ async function getAccuWeatherForecastDataAndCreateCUTask() {
       notify_all: true,
     });
 
-    // CU REQUEST
+    // Options
     let requestOptions = {
       method: "POST",
       headers: myHeaders,
@@ -148,17 +145,20 @@ async function getAccuWeatherForecastDataAndCreateCUTask() {
       redirect: "follow",
     };
 
-    // CU PROMISE
+    // Promise
     const clickUpTaskData = await fetch(
       `${clickupURL}/list/${clickupListID}/task`,
       requestOptions
     )
       .then((res) => res.json())
-      .then((data) => console.log(data))
+      .then((result) => console.log(result))
       .catch((err) => console.log(err));
 
     // Finally, assing the forecast message variable
     forecastMessage = `The chance of precipitation is ${precipitationProbability}% at ${timePrecipitationExpected}. Make sure you cover the firewood today.`;
+
+    return clickUpTaskData;
+
     /**
      * If precipitationLikely returns undefined,
      * it most likely means that there is no forecast in the next twelve hours that meets the >30% chance precip criteria.
@@ -176,5 +176,9 @@ async function getAccuWeatherForecastDataAndCreateCUTask() {
   }
 }
 
+async function start() {
+  return await createCUTask(getAccuWeatherForecastData);
+}
+
 // Call the function every twenty-four hours starting at a specific time
-// runAtTimeOfDay(07, 00, getAccuWeatherForecastDataAndCreateCUTask);
+runAtTimeOfDay(23, 19, start);
