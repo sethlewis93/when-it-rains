@@ -173,4 +173,4 @@ async function getAccuWeatherForecastDataAndCreateCUTask() {
 }
 
 // Call the function every twenty-four hours starting at a specific time
-runAtTimeOfDay(07, 00, getAccuWeatherForecastDataAndCreateCUTask);
+runAtTimeOfDay(21, 35, getAccuWeatherForecastDataAndCreateCUTask);
