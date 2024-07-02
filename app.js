@@ -1,8 +1,16 @@
 const express = require("express");
 const bodyParser = require("body-parser");
-
 const app = express();
 const port = 3000;
+
+// GLOBAL & ENV VARS
+const accuWeatherAPIKey = `${process.env.AW_API_KEY}`;
+const accuWeatherLocationKey = `${process.env.AW_LOCATION_KEY}`;
+const clickUpAPIKey = `${process.env.CLICKUP_API_KEY}`;
+const clickupListID = `${process.env.CLICKUP_LIST_ID}`;
+const accuWeatherForecastURL = `http://dataservice.accuweather.com/forecasts/v1/hourly/12hour/${accuWeather$
+const clickupURL = "https://api.clickup.com/api/v2";
+let forecastMessage = "Awaiting forecast";
 
 // Set view engine to EJS
 app.set("view engine", "ejs");
@@ -18,15 +26,6 @@ app.listen(process.env.PORT || port, () =>
 
 // Access hidden files in the .env file
 require("dotenv").config();
-
-// GLOBAL & ENV VARS
-const accuWeatherAPIKey = `${process.env.AW_API_KEY}`;
-const accuWeatherLocationKey = `${process.env.AW_LOCATION_KEY}`;
-const clickUpAPIKey = `${process.env.CLICKUP_API_KEY}`;
-const clickupListID = `${process.env.CLICKUP_LIST_ID}`;
-const accuWeatherForecastURL = `http://dataservice.accuweather.com/forecasts/v1/hourly/12hour/${accuWeatherLocationKey}?apikey=${accuWeatherAPIKey}`;
-const clickupURL = "https://api.clickup.com/api/v2";
-let forecastMessage = "Awaiting forecast";
 
 /**
  * Calls a function at a specific time of day
