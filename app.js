@@ -1,14 +1,14 @@
 const express = require("express");
 const bodyParser = require("body-parser");
 const app = express();
-const port = 3000;
+const port = 50275;
 
 // GLOBAL & ENV VARS
 const accuWeatherAPIKey = `${process.env.AW_API_KEY}`;
 const accuWeatherLocationKey = `${process.env.AW_LOCATION_KEY}`;
 const clickUpAPIKey = `${process.env.CLICKUP_API_KEY}`;
 const clickupListID = `${process.env.CLICKUP_LIST_ID}`;
-const accuWeatherForecastURL = `http://dataservice.accuweather.com/forecasts/v1/hourly/12hour/${accuWeather$
+const accuWeatherForecastURL = `http://dataservice.accuweather.com/forecasts/v1/hourly/12hour/${accuWeatherLocationKey}?apikey=${accuWeatherAPIKey}`;
 const clickupURL = "https://api.clickup.com/api/v2";
 let forecastMessage = "Awaiting forecast";
 
@@ -20,8 +20,8 @@ app.get("/", (req, res) => {
   res.render("pages/index", { forecastMessage: forecastMessage });
 });
 
-app.listen(process.env.PORT || port, () =>
-  console.log(`Listening on port ${port}`)
+app.listen(process.env.PORT || port, '0.0.0.0', () =>
+  console.log(`Listening on http://0.0.0.0:${port}`)
 );
 
 // Access hidden files in the .env file
@@ -35,28 +35,15 @@ require("dotenv").config();
  * @param {*} func
  */
 function runAtTimeOfDay(hour, minutes, func) {
-  const twentyFourHours = 86400000;
-  const now = new Date();
-  let timeInMilliseconds =
-    new Date(
-      now.getFullYear(),
-      now.getMonth(),
-      now.getDate(),
-      hour,
-      minutes,
-      0,
-      0
-    ).getTime() - now;
-  if (timeInMilliseconds < 0) {
-    timeInMilliseconds += twentyFourHours;
-  }
-  setTimeout(function () {
-    //run once
-    func();
+  // Run immediately
+  func();
+  console.log('Function executed at:', new Date().toLocaleString());
 
-    // run every 24 hours from now on
-    setInterval(func, twentyFourHours);
-  }, timeInMilliseconds);
+  // Then run every 10 seconds
+  setInterval(() => {
+    func();
+    console.log('Function executed at:', new Date().toLocaleString());
+  }, 10000);
 }
 
 // GET ACCUWEATHER DATA
