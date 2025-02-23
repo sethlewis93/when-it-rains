@@ -7,6 +7,7 @@ const port = 4000;
 require("dotenv").config();
 const accuWeatherAPIKey = `${process.env.AW_API_KEY}`;
 const accuWeatherLocationKey = `${process.env.AW_LOCATION_KEY}`;
+// Santonix key a/o Feb 22
 const clickUpAPIKey = `${process.env.CLICKUP_API_KEY}`;
 const clickupListID = `${process.env.CLICKUP_LIST_ID}`;
 const accuWeatherForecastURL = `http://dataservice.accuweather.com/forecasts/v1/hourly/12hour/${accuWeatherLocationKey}?apikey=${accuWeatherAPIKey}
@@ -33,6 +34,7 @@ app.listen(process.env.PORT || port, "0.0.0.0", () =>
  * @param {*} minutes
  * @param {*} func
  */
+// TO-DO: rename this function if testing to continue longer than a day
 function runAtTimeOfDay(hour, minutes, func) {
   // Run immediately
   func();
