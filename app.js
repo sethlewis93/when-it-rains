@@ -167,5 +167,5 @@ async function start() {
   return await createCUTask(getAccuWeatherForecastData);
 }
 
-// Call the function every twenty-four hours starting at a specific time
-runAtTimeOfDay(07, 00, start);
+// Call the function immediately and then every 10 seconds
+runAtTimeOfDay(0, 0, start);
