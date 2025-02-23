@@ -56,9 +56,9 @@ async function getAccuWeatherForecastData() {
    * @param {*} forecastArr
    * @returns the first forecast object where the PrecipitationProbability prop is greater than 30(%)
    */
-  function precipitationLikely(forecastArr) {
+  async function precipitationLikely(forecastArr) {
     return forecastArr.find(
-      (forecastObj) => forecastObj.PrecipitationProbability > 30
+      (forecastObj) => forecastObj["PrecipitationProbability"] > 30
     );
   }
 
