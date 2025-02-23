@@ -1,14 +1,16 @@
 const express = require("express");
 const bodyParser = require("body-parser");
 const app = express();
-const port = 50275;
+const port = 4000;
 
 // GLOBAL & ENV VARS
+require("dotenv").config();
 const accuWeatherAPIKey = `${process.env.AW_API_KEY}`;
 const accuWeatherLocationKey = `${process.env.AW_LOCATION_KEY}`;
 const clickUpAPIKey = `${process.env.CLICKUP_API_KEY}`;
 const clickupListID = `${process.env.CLICKUP_LIST_ID}`;
-const accuWeatherForecastURL = `http://dataservice.accuweather.com/forecasts/v1/hourly/12hour/${accuWeatherLocationKey}?apikey=${accuWeatherAPIKey}`;
+const accuWeatherForecastURL = `http://dataservice.accuweather.com/forecasts/v1/hourly/12hour/${accuWeatherLocationKey}?apikey=${accuWeatherAPIKey}
+`;
 const clickupURL = "https://api.clickup.com/api/v2";
 let forecastMessage = "Awaiting forecast";
 
@@ -20,12 +22,9 @@ app.get("/", (req, res) => {
   res.render("pages/index", { forecastMessage: forecastMessage });
 });
 
-app.listen(process.env.PORT || port, '0.0.0.0', () =>
+app.listen(process.env.PORT || port, "0.0.0.0", () =>
   console.log(`Listening on http://0.0.0.0:${port}`)
 );
-
-// Access hidden files in the .env file
-require("dotenv").config();
 
 /**
  * Calls a function at a specific time of day
@@ -37,20 +36,20 @@ require("dotenv").config();
 function runAtTimeOfDay(hour, minutes, func) {
   // Run immediately
   func();
-  console.log('Function executed at:', new Date().toLocaleString());
+  console.log("Function executed at:", new Date().toLocaleString());
 
   // Then run every 10 seconds
   setInterval(() => {
     func();
-    console.log('Function executed at:', new Date().toLocaleString());
+    console.log("Function executed at:", new Date().toLocaleString());
   }, 10000);
 }
 
 // GET ACCUWEATHER DATA
 async function getAccuWeatherForecastData() {
-  const forecast = await fetch(accuWeatherForecastURL).then((res) =>
-    res.json()
-  );
+  const forecast = await fetch(accuWeatherForecastURL).then((res) => {
+    res.json();
+  });
 
   /**
    *
