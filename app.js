@@ -34,17 +34,26 @@ app.listen(process.env.PORT || port, "0.0.0.0", () =>
  * @param {*} minutes
  * @param {*} func
  */
-// TO-DO: rename this function if testing to continue longer than a day
 function runAtTimeOfDay(hour, minutes, func) {
-  // Run immediately
-  func();
-  console.log("Function executed at:", new Date().toLocaleString());
-
-  // Then run every 10 seconds
-  setInterval(() => {
+  const twentyFourHours = 86400000;
+  const now = new Date();
+  let timeInMilliseconds =
+    new Date(
+      now.getFullYear(),
+      now.getMonth(),
+      now.getDate(),
+      hour,
+      minutes,
+      0,
+      0
+    ).getTime() - now;
+  if (timeInMilliseconds < 0) {
+    timeInMilliseconds += twentyFourHours;
+  }
+  setTimeout(function () {
     func();
-    console.log("Function executed at:", new Date().toLocaleString());
-  }, 10000);
+    setInterval(func, twentyFourHours);
+  }, timeInMilliseconds);
 }
 
 // GET ACCUWEATHER DATA
@@ -168,5 +177,5 @@ async function start() {
   return await createCUTask(getAccuWeatherForecastData);
 }
 
-// Call the function immediately and then every 10 seconds
-runAtTimeOfDay(0, 0, start);
+// Call the function every day at 7:00 AM
+runAtTimeOfDay(7, 0, start);
