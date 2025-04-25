@@ -1,14 +1,17 @@
 const express = require("express");
 const bodyParser = require("body-parser");
 const app = express();
-const port = 3000;
+const port = 4000;
 
 // GLOBAL & ENV VARS
+require("dotenv").config();
 const accuWeatherAPIKey = `${process.env.AW_API_KEY}`;
 const accuWeatherLocationKey = `${process.env.AW_LOCATION_KEY}`;
+// Santonix key a/o Feb 22
 const clickUpAPIKey = `${process.env.CLICKUP_API_KEY}`;
 const clickupListID = `${process.env.CLICKUP_LIST_ID}`;
-const accuWeatherForecastURL = `http://dataservice.accuweather.com/forecasts/v1/hourly/12hour/${accuWeather$
+const accuWeatherForecastURL = `http://dataservice.accuweather.com/forecasts/v1/hourly/12hour/${accuWeatherLocationKey}?apikey=${accuWeatherAPIKey}
+`;
 const clickupURL = "https://api.clickup.com/api/v2";
 let forecastMessage = "Awaiting forecast";
 
@@ -20,12 +23,9 @@ app.get("/", (req, res) => {
   res.render("pages/index", { forecastMessage: forecastMessage });
 });
 
-app.listen(process.env.PORT || port, () =>
-  console.log(`Listening on port ${port}`)
+app.listen(process.env.PORT || port, "0.0.0.0", () =>
+  console.log(`Listening on http://0.0.0.0:${port}`)
 );
-
-// Access hidden files in the .env file
-require("dotenv").config();
 
 /**
  * Calls a function at a specific time of day
@@ -51,28 +51,25 @@ function runAtTimeOfDay(hour, minutes, func) {
     timeInMilliseconds += twentyFourHours;
   }
   setTimeout(function () {
-    //run once
     func();
-
-    // run every 24 hours from now on
     setInterval(func, twentyFourHours);
   }, timeInMilliseconds);
 }
 
 // GET ACCUWEATHER DATA
 async function getAccuWeatherForecastData() {
-  const forecast = await fetch(accuWeatherForecastURL).then((res) =>
-    res.json()
-  );
+  const forecast = await fetch(accuWeatherForecastURL).then((res) => {
+    res.json();
+  });
 
   /**
    *
    * @param {*} forecastArr
    * @returns the first forecast object where the PrecipitationProbability prop is greater than 30(%)
    */
-  function precipitationLikely(forecastArr) {
+  async function precipitationLikely(forecastArr) {
     return forecastArr.find(
-      (forecastObj) => forecastObj.PrecipitationProbability > 30
+      (forecastObj) => forecastObj["PrecipitationProbability"] > 30
     );
   }
 
@@ -180,5 +177,5 @@ async function start() {
   return await createCUTask(getAccuWeatherForecastData);
 }
 
-// Call the function every twenty-four hours starting at a specific time
-runAtTimeOfDay(07, 00, start);
+// Call the function every day at 7:00 AM
+runAtTimeOfDay(7, 0, start);
